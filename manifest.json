@@ -1,0 +1,9 @@
+{
+  "name": "HueRex Selection Eyedropper",
+  "id": "com.yourdomain.selection-eyedropper",
+  "api": "1.0.0",
+  "main": "code.js",
+  // <- this must be a secure URL (HTTPS or localhost)
+  "ui": "https://your-secure-host.com/figma-ui/ui.html",
+  "editorType": ["figma"]
+}
