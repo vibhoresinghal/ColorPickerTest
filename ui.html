@@ -2,68 +2,30 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Selection Colors Eyedropper</title>
+  <title>Pure Eye-Dropper</title>
   <style>
-    body { font-family: sans-serif; margin: 8px; }
-    .color-item { display: flex; align-items: center; margin-bottom: 8px; }
-    .swatch { width: 24px; height: 24px; border: 1px solid #ccc; margin-right: 8px; }
-    button { margin-left: auto; }
+    body { font-family: sans-serif; display: flex; height: 100vh; align-items: center; justify-content: center; }
+    button { padding: 8px 12px; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
-  <h3>Selected Colors</h3>
-  <div id="list"></div>
+  <button id="eye-drop">🎨 Pick a Color</button>
 
   <script>
-    // 1️⃣ Render list when main code sends us the selection colors
-    window.onmessage = (event) => {
-      const msg = event.data.pluginMessage;
-      if (msg.type === 'init-colors') {
-        renderList(msg.colors);
+    document.getElementById('eye-drop').onclick = async () => {
+      if (!window.EyeDropper) {
+        alert('EyeDropper API still unavailable. Are you on HTTPS or localhost?');
+        return;
+      }
+      try {
+        const { sRGBHex } = await new EyeDropper().open();
+        // send the single picked hex back to the plugin
+        parent.postMessage({ pluginMessage: { type: 'color-picked', hex: sRGBHex } }, '*');
+      } catch (e) {
+        // user canceled or some other error
+        console.warn('EyeDropper failed or was canceled', e);
       }
     };
-
-    // 2️⃣ Build each row: swatch + hex label + 🎨 Eye-drop button
-    function renderList(colors) {
-      const container = document.getElementById('list');
-      container.innerHTML = '';
-      colors.forEach((c, idx) => {
-        const row = document.createElement('div');
-        row.className = 'color-item';
-
-        const sw = document.createElement('div');
-        sw.className = 'swatch';
-        sw.style.backgroundColor = c.hex;
-        row.appendChild(sw);
-
-        const lbl = document.createElement('span');
-        lbl.textContent = `${c.hex}${c.opacity < 1 ? ` @${Math.round(c.opacity*100)}%` : ''}`;
-        row.appendChild(lbl);
-
-        const btn = document.createElement('button');
-        btn.textContent = '🎨 Eye-drop';
-        btn.onclick = async () => {
-          if (!window.EyeDropper) {
-            alert('EyeDropper API not supported in this environment.');
-            return;
-          }
-          try {
-            // open the native eyedropper
-            const { sRGBHex } = await new EyeDropper().open();
-            // send back which index and the picked hex
-            parent.postMessage({
-              pluginMessage: { type: 'color-picked', index: idx, hex: sRGBHex }
-            }, '*');
-          } catch (e) {
-            // user cancelled or error
-            console.warn('EyeDropper cancelled or failed', e);
-          }
-        };
-        row.appendChild(btn);
-
-        container.appendChild(row);
-      });
-    }
   </script>
 </body>
 </html>
