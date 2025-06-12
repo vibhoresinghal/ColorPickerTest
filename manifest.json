@@ -3,7 +3,6 @@
   "id": "com.yourdomain.selection-eyedropper",
   "api": "1.0.0",
   "main": "code.js",
-  // <- this must be a secure URL (HTTPS or localhost)
   "ui": "https://raw.githubusercontent.com/vibhoresinghal/ColorPickerTest/refs/heads/main/ui.html",
   "editorType": ["figma"]
 }
